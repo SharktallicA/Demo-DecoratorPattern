@@ -1,4 +1,27 @@
+/*
+	Decorator design pattern test
+	Khalid Ali 2018
+
+	Legal:
+		Star Trek and its branding is copyright of CBS Studios Inc.
+		References to the branding are included under the legally-acknowledged terms of "fair use"
+
+	Using:
+		1) create WarpDrive pointer with new object as the WarpDrive subtype you want (check "Warp Drives" region for list)
+			1.5) use getName() and getSpeed() to test the base drive's characteristics
+		2) create DriveEnhancement pointer with new object as the DriveEnhancement subtype you want (check "Drive Enhancements" region for list)
+		3) pass WarpDrive pointer created in 1) through method addToWarpDrive to bind WarpDrive to DriveEnhancement
+			3.5) if you want to add more enhancements, just assign a new DriveEnhancement to the same DriveEnhancement pointer and repeat step 3)
+		4) use getName() and getSpeed() to test the resultant drive's characteristics
+
+	Other Notes:
+		Based on a tutorial from University module for Data Structures & Algorithms for Object-Orientated Programming
+		Already complete usage example provided in main() function
+*/
+
+
 #include <iostream>
+#include <iomanip> //can be removed if setprecision() for cout is not needed
 #include <string>
 
 using namespace std;
@@ -16,6 +39,7 @@ using namespace std;
 class WarpDrive
 {
 	//purpose: abstract superclass for all Warp Drives
+	//note: never initialise - only use for pointer declaration
 
 protected:
 	string itemName = "";
@@ -24,9 +48,6 @@ public:
 	virtual ~WarpDrive() {}
 	virtual string getName(void) { return this->itemName; }
 	virtual float getSpeed(void) { return this->itemSpeed; }
-	virtual void displayDrive(void) { cout << "Warp " << itemSpeed << "-rated " << itemName << endl; }
-	virtual void start(void) { cout << "Firing up Warp Drive!" << endl; }
-	virtual void engage(void) { cout << "Engaging Warp" << itemSpeed << "!" << endl; }
 };
 class NuclearFissionDrive : public WarpDrive
 {
@@ -71,6 +92,7 @@ public:
 class DriveEnhancement : public WarpDrive
 {
 	//purpose: abstract superclass for all Drive Enhancements
+	//note: never initialise - only use for pointer declaration
 
 protected:
 	WarpDrive* drive = nullptr;
@@ -78,23 +100,21 @@ public:
 	~DriveEnhancement() { delete drive; }
 	virtual string getName(void) { return drive->getName() + " + " + this->itemName; }
 	virtual float getSpeed(void) { return this->itemSpeed + drive->getSpeed(); }
-	virtual void addEnhancement(void) { cout << itemName << endl; }
 	void addToWarpDrive(WarpDrive* drive) { this->drive = drive; };
-	void start(void) { drive->start(); addEnhancement(); }
 };
 class StrongerContainmentField : public DriveEnhancement
 {
 	//purpose: inheriting DriveEnhancement subclass for Stronger Containment Field enhancement
 
 public:
-	StrongerContainmentField(void) { itemName = "Stronger Containment Field"; itemSpeed = 0.25f; }
+	StrongerContainmentField(void) { itemName = "Stronger Containment Field"; itemSpeed = 0.125f; }
 };
 class ReinforcedPlasmaInjectors : public DriveEnhancement
 {
 	//purpose: inheriting DriveEnhancement subclass for Reinforced Plasma Injectors enhancement
 
 public:
-	ReinforcedPlasmaInjectors(void) { itemName = "Reinforced Plasma Injectors"; itemSpeed = 0.5f; }
+	ReinforcedPlasmaInjectors(void) { itemName = "Reinforced Plasma Injectors"; itemSpeed = 0.25f; }
 };
 class PurerDilithiumCrystals : public DriveEnhancement
 {
@@ -108,11 +128,39 @@ class UpratedWarpCoil : public DriveEnhancement
 	//purpose: inheriting DriveEnhancement subclass for Uprated Warp Coil enhancement
 
 public:
-	UpratedWarpCoil(void) { itemName = "Uprated Warp Coil"; itemSpeed = 2.0f; }
+	UpratedWarpCoil(void) { itemName = "Uprated Warp Coil"; itemSpeed = 1.5f; }
 };
 #pragma endregion
 
 int main(void)
 {
-	return 0;
+	//decorator pattern example with a Warp Drive upgrade
+
+	//initial warp drive
+	WarpDrive* currentDrive = new MatterAntimatterDrive;
+	
+	//test initial warp drive
+	cout << "This is a " << currentDrive->getName() << endl;
+	cout << "Engage, Warp " << currentDrive->getSpeed() << setprecision(3) << "!" << endl;
+
+	//apply all available upgrades
+	DriveEnhancement* currentEnhancement = new UpratedWarpCoil;
+	currentEnhancement->addToWarpDrive(currentDrive);
+	currentDrive = currentEnhancement;
+	currentEnhancement = new StrongerContainmentField;
+	currentEnhancement->addToWarpDrive(currentDrive);
+	currentDrive = currentEnhancement;
+	currentEnhancement = new PurerDilithiumCrystals;
+	currentEnhancement->addToWarpDrive(currentDrive);
+	currentDrive = currentEnhancement;
+	currentEnhancement = new ReinforcedPlasmaInjectors;
+	currentEnhancement->addToWarpDrive(currentDrive);
+	currentDrive = currentEnhancement;
+
+	//test enhanced warp drive
+	cout << endl << "This is a " << currentDrive->getName() << endl;
+	cout << "Engage, Warp " << currentDrive->getSpeed() << setprecision(3) << "!" << endl;
+
+	delete currentDrive;
+	return 0; //put breakpoint here to stop program to exiting straight away
 }
