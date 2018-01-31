@@ -42,6 +42,7 @@ class WarpDrive
 	//note: never initialise - only use for pointer declaration
 
 protected:
+	WarpDrive() {};
 	string itemName = "";
 	float itemSpeed = 0.0f;
 public:
@@ -95,6 +96,7 @@ class DriveEnhancement : public WarpDrive
 	//note: never initialise - only use for pointer declaration
 
 protected:
+	DriveEnhancement() {};
 	WarpDrive* drive = nullptr;
 public:
 	~DriveEnhancement() { delete drive; }
